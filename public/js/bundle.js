@@ -52,7 +52,7 @@ module.exports = {
 }
 },{}],4:[function(require,module,exports){
 class TableModel {
-	constructor (numCols=10, numRows=20) {
+	constructor (numCols=8, numRows=16) {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		this.data = {};
@@ -89,6 +89,8 @@ class TableView {
 		this.headerRowEl = document.querySelector('THEAD TR');
 		this.sheetBodyEl = document.querySelector('TBODY');
 		this.formulaBarEl = document.querySelector('#formula-bar');
+		this.footerRowEl = document.querySelector('TFOOT TR');
+		
 	}
 
 	initCurrentCell (){
@@ -109,6 +111,7 @@ class TableView {
 	renderTable(){
 		this.renderTableHeader();
 		this.renderTableBody();
+		this.renderTableFooter()
 	}
 
 	renderTableHeader(){
@@ -117,7 +120,10 @@ class TableView {
 		.map(colLabel => createTH(colLabel))
 		.forEach(th => this.headerRowEl.appendChild(th));
 	}
+    
 
+    	
+    
 	isCurrentCell(col, row){
 		return this.currentCellLocation.col === col &&
 		       this.currentCellLocation.row === row;
@@ -137,11 +143,34 @@ class TableView {
 				}
 				tr.appendChild(td);
 			}
-			fragment.appendChild(tr);
+			fragment.appendChild(tr); 
 		}
 		removeChildren(this.sheetBodyEl);
 		this.sheetBodyEl.appendChild(fragment);
 	}
+
+
+	renderTableFooter (){
+		removeChildren(this.footerRowEl);
+		for (let col = 0; col < this.model.numCols; col++){
+			let total = 0;
+			for (let row = 0; row < this.model.numRows; row++){
+				const location = {col:col, row:row};
+				const cellValue = Number(this.model.getValue(location))
+				if (!isNaN(cellValue)){
+				total+= cellValue;
+				}
+				
+			}
+			const td = createTD(total);
+			this.footerRowEl.appendChild(td);
+		}
+	}
+
+
+
+
+
 
 	attachEventHandlers() {
 		this.sheetBodyEl.addEventListener('click', this.handleSheetClick.bind(this));
@@ -154,6 +183,7 @@ class TableView {
 		const value = this.formulaBarEl.value;
 		this.model.setValue(this.currentCellLocation, value);
 		this.renderTableBody();
+		this.renderTableFooter();
 	}
     
     handleSheetClick(evt) {

@@ -45,6 +45,7 @@ describe('table-view', () => {
     	})
     })
 
+
     describe('table body', () => {
     	it('highlights the current cell when clicked', () => {
           
@@ -84,6 +85,26 @@ describe('table-view', () => {
 
     	});
     });
+
+     describe ('table footer',()  =>{
+         it ('footer sums rows and its column', () => {
+            const model = new TableModel()
+            const view = new TableView(model);
+            view.init();
+            
+            const tableFooter = document.querySelector('TFOOT TR');
+            expect(tableFooter[0].value).toEqual('');
+
+            const location = { col: 0, row: 1 };
+            model.setValue(location, 10);
+
+            expect(tableFooter[0].value).toEqual('10');
+
+         });
+
+
+     });
+     
 	describe('table header',() => {
 		it('has valid column header labels', () =>{
          const numCols = 6;
